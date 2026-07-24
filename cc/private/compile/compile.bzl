@@ -578,6 +578,7 @@ def _create_scan_deps_action(
         dotd_file = dotd_file,
         compile_build_variables = compile_variables,
         action_name = ACTION_NAMES.cpp_module_deps_scanning,
+        needs_include_validation = _starlark_cc_semantics.needs_include_validation(language),
         toolchain_type = _starlark_cc_semantics.toolchain,
         progress_message_prefix = progress_message_prefix,
     )
@@ -2327,6 +2328,10 @@ def _create_compile_action(
         source = None,
         toolchain_type = None,
         use_pic = False,
+        additional_outputs = [],
+        module_files = None,
+        modmap_file = None,
+        modmap_input_file = None,
         **kwargs):
     # TODO(bgorshenev): use bazel_features checks
     if progress_message_prefix:
@@ -2352,5 +2357,9 @@ def _create_compile_action(
         source = source,
         toolchain_type = toolchain_type,
         use_pic = use_pic,
+        additional_outputs = additional_outputs,
+        module_files = module_files,
+        modmap_file = modmap_file,
+        modmap_input_file = modmap_input_file,
         **kwargs
     )
