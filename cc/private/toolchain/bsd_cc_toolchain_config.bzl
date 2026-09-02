@@ -70,7 +70,7 @@ def _impl(ctx):
                     flag_group(
                         flags = [
                             "-lc++",
-                            "-Wl,-z,relro,-z,now",
+                            "-Wl,-z,relro,-z,now,-z,origin",
                             "-no-canonical-prefixes",
                         ],
                     ),
