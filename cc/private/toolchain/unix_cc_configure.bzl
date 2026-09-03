@@ -92,9 +92,7 @@ def _get_target_libc(repository_ctx, cc, darwin, compile_opts):
             ("__GLIBC__", "glibc"),
             ("__BIONIC__", "bionic"),
             ("__LLVM_LIBC__", "llvm-libc"),
-            ("__FreeBSD__", "freebsd"),
             ("__NetBSD__", "netbsd"),
-            ("__OpenBSD__", "openbsd"),
         ]:
             if ("#define %s " % macro) in result.stdout:
                 return libc
@@ -409,6 +407,8 @@ def configure_unix_toolchain(repository_ctx, cpu_value, overridden_tools):
     repository_ctx.file("tools/cpp/empty.cc", "int main() {}")
     darwin = cpu_value.startswith("darwin")
     bsd = cpu_value == "freebsd" or cpu_value == "openbsd"
+    if bsd:
+        fail("FreeBSD / OpenBSD should use bsd_cc_toolchain_config.bzl")
 
     cc = _find_generic(repository_ctx, "gcc", "CC", overridden_tools)
     is_clang = _is_clang(repository_ctx, cc)
@@ -569,7 +569,6 @@ def configure_unix_toolchain(repository_ctx, cpu_value, overridden_tools):
     # TODO: It's unclear why these flags aren't added on macOS.
     if bin_search_flags and not darwin:
         force_linker_flags.extend(bin_search_flags)
-    use_libcpp = darwin or bsd
     is_as_needed_supported = _is_linker_option_supported(
         repository_ctx,
         cc,
@@ -584,7 +583,7 @@ def configure_unix_toolchain(repository_ctx, cpu_value, overridden_tools):
         "-Wl,--push-state",
         "--push-state",
     )
-    if use_libcpp:
+    if darwin:
         bazel_default_libs = ["-lc++", "-lm"]
     else:
         bazel_default_libs = ["-lstdc++", "-lm"]
